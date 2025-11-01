@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The_Algossians'</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #c50e0e, #230eaa);
+      color: white;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+    }
+
+    .btn-cta {
+      background: #ff4b6e;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .btn-cta:hover {
+      background: #ff2e55;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 80px 60px;
+    }
+
+    .hero-text {
+      max-width: 50%;
+    }
+
+    .hero-text h1 {
+      font-size: 2.8rem;
+      margin-bottom: 20px;
+    }
+
+    .hero-text p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .hero-img {
+      max-width: 45%;
+    }
+
+    .hero-img img {
+      width: 100%;
+    }
+
+    /* Features row */
+    .features {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 40px 60px;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .feature {
+      text-align: center;
+    }
+
+    .feature h3 {
+      margin-top: 10px;
+      font-size: 1.2rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+      .hero-text, .hero-img {
+        max-width: 100%;
+      }
+      nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">LifeNix</div>
+    <nav>
+      <a href="#">WHAT WE DO</a>
+      <a href="#"></a>
+      <a href="#">HELP</a>
+      <a href="#">LANGUAGE</a>
+      <a href="login-signup-page.html" class="btn-cta">Login</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-text">
+      <h1>All Problem, One Solution!</h1>
+      <p>
+        <H2>Health is Wealth! So our team provides healthcare benefits to those who are in need!</H2>
+      </p>
+      <a href="#" class="btn-cta">Signup</a>
+    </div>
+    <div class="hero-img">
+      <img src="#" alt="Illustration">
+    </div>
+  </section>
+
+  <!-- Features Row -->
+  <section class="features">
+    <div class="feature">
+      <img src="#" alt="icon"><br><br><br>
+      <a href="html.html" class="btn-cta">Diabetes Check</a>
+    </div>
+    <div class="feature">
+      <img src="#" alt="icon"><br><br><br>
+      <a href="html.html" class="btn-cta">Blood Pressure Check</a>
+    </div>
+    <div class="feature">
+      <img src="#" alt="icon"><br><br><br>
+      <a href="html.html" class="btn-cta">ARTHERITIS?</a>
+    </div>
+    <div class="feature">
+      <img src="#" alt="icon"><br><br><br>
+      <a href="html.html" class="btn-cta">MIGRANE?</a>
+    </div>
+  </section>
+
+</body>
+</html>
