@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCare Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar { transition: transform 0.3s; }
+        .sidebar-hidden { transform: translateX(-100%); }
+        @media (min-width: 1024px) { .sidebar-hidden { transform: translateX(0); }}
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        body.dark { background: #111827; color: #f3f4f6; }
+        body.dark .bg-white { background: #1f2937; }
+        body.dark .text-gray-800 { color: #f3f4f6; }
+        body.dark .border-gray-200 { border-color: #374151; }
+        body.dark .bg-gray-50 { background: #374151; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+    
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 sidebar-hidden lg:translate-x-0">
+        <div class="flex items-center justify-between p-6 border-b">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-400 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-heartbeat text-white"></i>
+                </div>
+                <span class="font-bold text-xl">MediCare</span>
+            </div>
+            <button id="closeSidebar" class="lg:hidden"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="p-4 space-y-1">
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white"><i class="fas fa-chart-line"></i><span>Dashboard</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-calendar-alt"></i><span>Appointments</span></button>
+            <a href="MEDIVAULT.html" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-folder"></i><span>Medical Vault</span></a>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-brain"></i><span>AI Symptom Checker</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-stethoscope"></i><span>Doctor Finder</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-leaf"></i><span>Ayurvedic</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-droplet"></i><span>Homeopathic</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-book-open"></i><span>Articles</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-gift"></i><span>Offers</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-user"></i><span>Profile</span></button>
+            <button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+        </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="lg:ml-64 flex flex-col min-h-screen">
+        <header class="bg-white border-b px-6 py-4 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center space-x-4">
+                <button id="menuBtn" class="lg:hidden"><i class="fas fa-bars text-xl"></i></button>
+                <div>
+                    <h1 class="text-2xl font-bold">Welcome back, Sarah Mitchell! 👋</h1>
+                    <p class="text-sm text-gray-600" id="datetime"></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-lg hover:bg-gray-100"><i class="fas fa-bell"></i></button>
+                <button id="darkModeToggle" class="p-2 rounded-lg hover:bg-gray-100"><i class="fas fa-moon"></i></button>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-green-400 rounded-full flex items-center justify-center text-white font-bold">SM</div>
+            </div>
+        </header>
+
+        <main class="flex-1 p-6">
+            <!-- Vitals -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div class="bg-white border rounded-xl p-6 card-hover transition-all">
+                    <div class="flex justify-between mb-4">
+                        <div class="bg-red-50 p-3 rounded-lg"><i class="fas fa-heartbeat text-red-500 text-2xl"></i></div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">normal</span>
+                    </div>
+                    <h3 class="text-sm text-gray-600 mb-2">Heart Rate</h3>
+                    <p class="text-3xl font-bold">72 <span class="text-xs text-gray-500">bpm</span></p>
+                </div>
+                <div class="bg-white border rounded-xl p-6 card-hover transition-all">
+                    <div class="flex justify-between mb-4">
+                        <div class="bg-blue-50 p-3 rounded-lg"><i class="fas fa-activity text-blue-500 text-2xl"></i></div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">normal</span>
+                    </div>
+                    <h3 class="text-sm text-gray-600 mb-2">Blood Pressure</h3>
+                    <p class="text-3xl font-bold">120/80 <span class="text-xs text-gray-500">mmHg</span></p>
+                </div>
+                <div class="bg-white border rounded-xl p-6 card-hover transition-all">
+                    <div class="flex justify-between mb-4">
+                        <div class="bg-green-50 p-3 rounded-lg"><i class="fas fa-walking text-green-500 text-2xl"></i></div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">good</span>
+                    </div>
+                    <h3 class="text-sm text-gray-600 mb-2">Steps</h3>
+                    <p class="text-3xl font-bold">8,547 <span class="text-xs text-gray-500">steps</span></p>
+                </div>
+                <div class="bg-white border rounded-xl p-6 card-hover transition-all">
+                    <div class="flex justify-between mb-4">
+                        <div class="bg-indigo-50 p-3 rounded-lg"><i class="fas fa-moon text-indigo-500 text-2xl"></i></div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">good</span>
+                    </div>
+                    <h3 class="text-sm text-gray-600 mb-2">Sleep</h3>
+                    <p class="text-3xl font-bold">7.5 <span class="text-xs text-gray-500">hours</span></p>
+                </div>
+                <div class="bg-white border rounded-xl p-6 card-hover transition-all">
+                    <div class="flex justify-between mb-4">
+                        <div class="bg-orange-50 p-3 rounded-lg"><i class="fas fa-fire text-orange-500 text-2xl"></i></div>
+                        <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">normal</span>
+                    </div>
+                    <h3 class="text-sm text-gray-600 mb-2">Calories</h3>
+                    <p class="text-3xl font-bold">1,847 <span class="text-xs text-gray-500">kcal</span></p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-6 mb-6">
+                <!-- AI Insights -->
+                <div class="lg:col-span-2 bg-white border rounded-xl p-6">
+                    <div class="flex justify-between mb-6">
+                        <div class="flex items-center space-x-2">
+                            <i class="fas fa-brain text-purple-500 text-2xl"></i>
+                            <h2 class="text-xl font-bold">AI Health Insights</h2>
+                        </div>
+                        <button class="px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg text-sm">Ask AI</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex space-x-3 p-4 rounded-lg bg-gray-50">
+                            <i class="fas fa-activity text-blue-500"></i>
+                            <p class="text-sm">Your blood pressure has been consistently normal for the past 30 days. Keep up the good work!</p>
+                        </div>
+                        <div class="flex space-x-3 p-4 rounded-lg bg-gray-50">
+                            <i class="fas fa-droplet text-green-500"></i>
+                            <p class="text-sm">Consider increasing your daily water intake to 8 glasses based on your activity level.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Vault -->
+                <div class="bg-white border rounded-xl p-6">
+                    <div class="flex justify-between mb-6">
+                        <h2 class="text-xl font-bold">Medical Vault</h2>
+                        <button class="text-blue-500 text-sm">View All</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between p-3 rounded-lg bg-gray-50 cursor-pointer">
+                            <div class="flex space-x-3">
+                                <i class="fas fa-file-alt text-blue-500 text-2xl"></i>
+                                <div>
+                                    <h3 class="text-sm font-medium">Blood Test Report</h3>
+                                    <p class="text-xs text-gray-500">2.4 MB</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-500">Oct 28</span>
+                        </div>
+                        <div class="flex justify-between p-3 rounded-lg bg-gray-50 cursor-pointer">
+                            <div class="flex space-x-3">
+                                <i class="fas fa-file-alt text-blue-500 text-2xl"></i>
+                                <div>
+                                    <h3 class="text-sm font-medium">X-Ray Chest</h3>
+                                    <p class="text-xs text-gray-500">5.1 MB</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-gray-500">Oct 15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments -->
+            <div class="bg-white border rounded-xl p-6 mb-6">
+                <div class="flex justify-between mb-6">
+                    <h2 class="text-xl font-bold">Upcoming Appointments</h2>
+                    <button class="text-blue-500 text-sm">View All</button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-4">
+                    <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">K</div>
+                        <div>
+                            <h3 class="font-semibold">Dr. Rajesh Kumar</h3>
+                            <p class="text-sm text-gray-600">Cardiologist</p>
+                            <p class="text-xs text-gray-500">Nov 5, 10:30 AM</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">S</div>
+                        <div>
+                            <h3 class="font-semibold">Dr. Priya Sharma</h3>
+                            <p class="text-sm text-gray-600">Dermatologist</p>
+                            <p class="text-xs text-gray-500">Nov 8, 2:00 PM</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4 p-4 rounded-lg bg-gray-50">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-bold">P</div>
+                        <div>
+                            <h3 class="font-semibold">Dr. Amit Patel</h3>
+                            <p class="text-sm text-gray-600">General Physician</p>
+                            <p class="text-xs text-gray-500">Nov 12, 11:00 AM</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid md:grid-cols-4 gap-4">
+                <button class="flex items-center space-x-3 p-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg">
+                    <i class="fas fa-ambulance text-2xl"></i>
+                    <span class="font-semibold">Book Ambulance</span>
+                </button>
+                <button class="flex items-center space-x-3 p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg">
+                    <i class="fas fa-upload text-2xl"></i>
+                    <span class="font-semibold">Upload Report</span>
+                </button>
+                <button class="flex items-center space-x-3 p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg">
+                    <i class="fas fa-phone text-2xl"></i>
+                    <span class="font-semibold">Teleconsultation</span>
+                </button>
+                <button class="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg">
+                    <i class="fas fa-search text-2xl"></i>
+                    <span class="font-semibold">Find Doctors</span>
+                </button>
+            </div>
+        </main>
+
+        <footer class="bg-white border-t px-6 py-4">
+            <div class="flex flex-col sm:flex-row justify-between items-center">
+                <p class="text-sm text-gray-600">© 2025 MediCare AI Healthcare</p>
+                <div class="flex space-x-4 text-sm">
+                    <a href="#" class="text-blue-500">Privacy</a>
+                    <a href="#" class="text-blue-500">Terms</a>
+                    <a href="#" class="text-blue-500">Support</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Menu Toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const closeSidebar = document.getElementById('closeSidebar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-hidden');
+            overlay.classList.toggle('hidden');
+        });
+
+        closeSidebar.addEventListener('click', () => {
+            sidebar.classList.add('sidebar-hidden');
+            overlay.classList.add('hidden');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.add('sidebar-hidden');
+            overlay.classList.add('hidden');
+        });
+
+        // Dark Mode
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const icon = darkModeToggle.querySelector('i');
+            icon.classList.toggle('fa-moon');
+            icon.classList.toggle('fa-sun');
+        });
+
+        // Date Time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = now.toLocaleDateString('en-US', options);
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('datetime').textContent = `${date} • ${time}`;
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
