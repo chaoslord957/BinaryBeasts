@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMBUlance - AI Healthcare Booking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f4f8 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            padding: 1.2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: 0.5px;
+        }
+
+        .logo .ambulance-icon {
+            font-size: 2.2rem;
+            animation: flash 2s infinite;
+        }
+
+        @keyframes flash {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.5; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .nav-links a.active {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 2.5rem auto;
+            padding: 0 3rem;
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 2.5rem;
+            min-height: calc(100vh - 200px);
+        }
+
+        .booking-panel {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .booking-panel h2 {
+            color: #1976d2;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .input-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: #555;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .location-input {
+            position: relative;
+        }
+
+        .location-input input {
+            width: 100%;
+            padding: 1rem 3rem 1rem 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .location-input input:focus {
+            outline: none;
+            border-color: #1976d2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .location-input::after {
+            content: '📍';
+            position: absolute;
+            right: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.3rem;
+        }
+
+        select {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #1976d2;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .distance-slider {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .slider-label .distance-value {
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1976d2;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 8px rgba(25, 118, 210, 0.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #1976d2;
+            cursor: pointer;
+            border: none;
+        }
+
+        .price-display {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            padding: 1.8rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .price-display h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .price-display .price {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .price-breakdown {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            opacity: 0.95;
+        }
+
+        .find-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .find-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(25, 118, 210, 0.4);
+        }
+
+        .find-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .map-section {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .map-view {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-view h3 {
+            color: #1976d2;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .map-placeholder {
+            width: 100%;
+            height: calc(100% - 50px);
+            background: 
+                linear-gradient(45deg, #e8f5e9 25%, transparent 25%, transparent 75%, #e8f5e9 75%, #e8f5e9),
+                linear-gradient(45deg, #e8f5e9 25%, transparent 25%, transparent 75%, #e8f5e9 75%, #e8f5e9);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: #999;
+            position: relative;
+            border: 2px solid #e0e0e0;
+        }
+
+        .ambulance-marker {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .ambulance-marker:hover {
+            transform: scale(1.15);
+            z-index: 10;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            }
+            50% { 
+                transform: scale(1.08);
+                box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+            }
+        }
+
+        .ambulance-list {
+            display: none;
+        }
+
+        .ambulance-list.active {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .ambulance-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .ambulance-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+            border-color: #1976d2;
+        }
+
+        .ambulance-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .driver-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1976d2, #64b5f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.6rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .driver-info h4 {
+            color: #333;
+            margin-bottom: 0.3rem;
+            font-size: 1.2rem;
+        }
+
+        .driver-info .rating {
+            color: #ffc107;
+            font-size: 0.95rem;
+        }
+
+        .ambulance-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .detail-item {
+            font-size: 0.95rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .detail-item strong {
+            color: #1976d2;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-item span {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .ambulance-price {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #4caf50;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .book-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-80px) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h2 {
+            color: #1976d2;
+            font-size: 1.8rem;
+        }
+
+        .modal-header .icon {
+            font-size: 3rem;
+        }
+
+        .booking-summary {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 1rem;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #4caf50;
+            padding-top: 1.2rem;
+            margin-top: 0.5rem;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .summary-row span:first-child {
+            color: #666;
+        }
+
+        .summary-row span:last-child {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-actions button:hover {
+            transform: translateY(-3px);
+        }
+
+        .confirm-btn {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .cancel-btn {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .cancel-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            color: white;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .footer p {
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 1.5rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        .success-animation {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .success-animation .checkmark {
+            font-size: 5rem;
+            color: #4caf50;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .success-animation h3 {
+            color: #4caf50;
+            margin-top: 1.5rem;
+            font-size: 1.6rem;
+        }
+
+        .success-animation p {
+            margin-top: 0.8rem;
+            color: #666;
+            font-size: 1.05rem;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0) rotate(-180deg);
+            }
+            to {
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .booking-panel {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <span class="ambulance-icon">🚑</span>
+            <span>AMBUlance</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#" class="active">Book Ambulance</a></li>
+            <li><a href="#">My Rides</a></li>
+            <li><a href="#">Profile</a></li>
+            <li><a href="#">Help</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="booking-panel">
+            <h2>🚑 Book an Ambulance</h2>
+            
+            <div class="input-group">
+                <label>Pickup Location</label>
+                <div class="location-input">
+                    <input type="text" id="pickup" placeholder="Enter pickup location" value="MG Road, Bangalore">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Drop Location</label>
+                <div class="location-input">
+                    <input type="text" id="drop" placeholder="Enter drop location" value="Apollo Hospital, Bangalore">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Ambulance Type</label>
+                <select id="ambulanceType">
+                    <option value="basic">Basic Life Support (BLS)</option>
+                    <option value="icu">ICU Equipped Ambulance</option>
+                    <option value="neonatal">Neonatal Ambulance</option>
+                    <option value="cardiac">Cardiac Ambulance</option>
+                    <option value="mortuary">Mortuary Van</option>
+                </select>
+            </div>
+
+            <div class="distance-slider">
+                <div class="slider-label">
+                    <span>Distance</span>
+                    <span class="distance-value"><span id="distanceValue">12</span> km</span>
+                </div>
+                <input type="range" id="distanceSlider" min="1" max="50" value="12">
+            </div>
+
+            <div class="price-display">
+                <h3>Estimated Fare</h3>
+                <div class="price" id="estimatedPrice">₹330</div>
+                <div class="price-breakdown">
+                    <span>Base: ₹<span id="basePrice">150</span></span>
+                    <span>Distance: ₹<span id="distPrice">180</span></span>
+                </div>
+            </div>
+
+            <button class="find-btn" onclick="findAmbulance()">🔍 Find Ambulance</button>
+        </div>
+
+        <div class="map-section">
+            <div class="map-view">
+                <h3>📍 Available Ambulances Nearby</h3>
+                <div class="map-placeholder">
+                    🗺️ Live Map View
+                    <div class="ambulance-marker" style="top: 15%; left: 25%;" title="Ambulance 1">🚑</div>
+                    <div class="ambulance-marker" style="top: 55%; left: 55%;" title="Ambulance 2">🚑</div>
+                    <div class="ambulance-marker" style="top: 35%; left: 70%;" title="Ambulance 3">🚑</div>
+                </div>
+            </div>
+
+            <div class="ambulance-list" id="ambulanceList">
+                <!-- Ambulance cards will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="icon">🚑</span>
+                <h2>Confirm Booking</h2>
+            </div>
+            <div class="booking-summary" id="bookingSummary">
+                <!-- Summary will be populated here -->
+            </div>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="confirm-btn" onclick="confirmBooking()">Confirm Booking</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>©️ 2025 AI Healthcare | Emergency Helpline: 108 | 24/7 Service</p>
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact Us</a>
+            <a href="#">Emergency Guidelines</a>
+        </div>
+    </footer>
+
+    <script>
+        const ambulanceData = [
+            {
+                id: 1,
+                driver: "Rajesh Kumar",
+                initial: "RK",
+                type: "Basic Life Support",
+                vehicle: "Force Traveller - KA-05-MN-1234",
+                distance: "2.3 km",
+                eta: "8 mins",
+                basePrice: 280,
+                rating: "⭐ 4.8 (245 rides)"
+            },
+            {
+                id: 2,
+                driver: "Priya Sharma",
+                initial: "PS",
+                type: "ICU Equipped",
+                vehicle: "Mahindra Ambulance - KA-03-AB-5678",
+                distance: "3.1 km",
+                eta: "12 mins",
+                basePrice: 520,
+                rating: "⭐ 4.9 (312 rides)"
+            },
+            {
+                id: 3,
+                driver: "Mohammed Ali",
+                initial: "MA",
+                type: "Cardiac Ambulance",
+                vehicle: "Tata Winger - KA-01-CD-9012",
+                distance: "1.8 km",
+                eta: "6 mins",
+                basePrice: 580,
+                rating: "⭐ 5.0 (189 rides)"
+            }
+        ];
+
+        const priceMultipliers = {
+            basic: 1,
+            icu: 1.5,
+            neonatal: 1.7,
+            cardiac: 1.8,
+            mortuary: 1.3
+        };
+
+        let selectedAmbulance = null;
+
+        function calculatePrice() {
+            const type = document.getElementById('ambulanceType').value;
+            const distance = parseInt(document.getElementById('distanceSlider').value);
+            const basePrice = 150;
+            const pricePerKm = 15;
+            const multiplier = priceMultipliers[type];
+            
+            const distPrice = pricePerKm * distance;
+            const additionalCharge = type !== 'basic' ? (multiplier - 1) * 200 : 0;
+            const total = (basePrice + distPrice + additionalCharge);
+            
+            document.getElementById('estimatedPrice').textContent = '₹' + Math.round(total);
+            document.getElementById('basePrice').textContent = basePrice;
+            document.getElementById('distPrice').textContent = Math.round(distPrice + additionalCharge);
+        }
+
+        document.getElementById('ambulanceType').addEventListener('change', calculatePrice);
+        
+        document.getElementById('distanceSlider').addEventListener('input', function(e) {
+            document.getElementById('distanceValue').textContent = e.target.value;
+            calculatePrice();
+        });
+
+        function findAmbulance() {
+            const list = document.getElementById('ambulanceList');
+            list.innerHTML = '';
+            
+            ambulanceData.forEach(amb => {
+                const card = document.createElement('div');
+                card.className = 'ambulance-card';
+                card.innerHTML = `
+                    <div class="ambulance-header">
+                        <div class="driver-avatar">${amb.initial}</div>
+                        <div class="driver-info">
+                            <h4>${amb.driver}</h4>
+                            <span class="rating">${amb.rating}</span>
+                        </div>
+                    </div>
+                    <div class="ambulance-details">
+                        <div class="detail-item">
+                            <strong>Type</strong>
+                            <span>${amb.type}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Vehicle</strong>
+                            <span>${amb.vehicle}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Distance</strong>
+                            <span>${amb.distance}</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>ETA</strong>
+                            <span>${amb.eta}</span>
+                        </div>
+                    </div>
+                    <div class="ambulance-price">₹${amb.basePrice}</div>
+                    <button class="book-btn" onclick="openBookingModal(${amb.id})">Book Now</button>
+                `;
+                list.appendChild(card);
+            });
+            
+            list.classList.add('active');
+            
+            // Smooth scroll to results
+            list.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function openBookingModal(id) {
+            selectedAmbulance = ambulanceData.find(amb => amb.id === id);
+            const pickup = document.getElementById('pickup').value;
+            const drop = document.getElementById('drop').value;
+            const type = document.getElementById('ambulanceType').selectedOptions[0].text;
+            const distance = document.getElementById('distanceValue').textContent;
+            
+            const summary = document.getElementById('bookingSummary');
+            summary.innerHTML = `
+                <div class="summary-row">
+                    <span>Pickup Location:</span>
+                    <span>${pickup}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Drop Location:</span>
+                    <span>${drop}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Distance:</span>
+                    <span>${distance} km</span>
+                </div>
+                <div class="summary-row">
+                    <span>Driver Name:</span>
+                    <span>${selectedAmbulance.driver}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Ambulance Type:</span>
+                    <span>${type}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Vehicle:</span>
+                    <span>${selectedAmbulance.vehicle}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Estimated Arrival:</span>
+                    <span>${selectedAmbulance.eta}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total Fare:</span>
+                    <span
