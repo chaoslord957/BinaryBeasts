@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - AI Healthcare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            color: #2d3748;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1e40af 0%, #3b82f6 100%);
+            padding: 20px;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #1e40af;
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.15);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.25);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 20px;
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            color: #1e40af;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: #3b82f6;
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #10b981, #3b82f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* Dashboard Grid */
+        .dashboard {
+            padding: 30px;
+            display: grid;
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+            transform: translateY(-3px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: #3b82f6;
+        }
+
+        .view-all {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .view-all:hover {
+            color: #1e40af;
+        }
+
+        /* Patient Table */
+        .patient-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .patient-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .patient-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .patient-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-critical { background: #fee; color: #dc2626; }
+        .status-stable { background: #d1fae5; color: #059669; }
+        .status-monitoring { background: #fef3c7; color: #d97706; }
+
+        /* Appointments */
+        .appointment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .appointment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s;
+        }
+
+        .appointment-item:hover {
+            background: #f1f5f9;
+            transform: translateX(5px);
+        }
+
+        .appointment-info h4 {
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .appointment-info p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .join-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .join-btn:hover {
+            background: #059669;
+            transform: scale(1.05);
+        }
+
+        /* AI Insights */
+        .insight-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            background: #eff6ff;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .insight-content h4 {
+            color: #1e293b;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .insight-content p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .insight-time {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        /* Reports */
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .report-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            background: #e2e8f0;
+            transform: translateY(-5px);
+        }
+
+        .report-icon {
+            font-size: 40px;
+            color: #3b82f6;
+            margin-bottom: 10px;
+        }
+
+        .report-card h4 {
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .report-card p {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .report-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-view {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #1e40af;
+        }
+
+        .btn-download {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #059669;
+        }
+
+        /* Messages */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .message-item:hover {
+            background: #f1f5f9;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .message-content h4 {
+            color: #1e293b;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .message-content p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-top: 5px;
+        }
+
+        .unread {
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            padding: 20px 30px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
+        }
+
+        .footer p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #1e40af;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .patient-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .report-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .header-left h1 {
+                font-size: 22px;
+            }
+
+            .dashboard {
+                padding: 20px 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .appointment-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .join-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
+            <span class="logo-text">AI Healthcare</span>
+        </div>
+        <nav>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Patient List</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Appointments</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-brain"></i>
+                <span>AI Insights</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-file-medical"></i>
+                <span>Medical Reports</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-comments"></i>
+                <span>Messages</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-leaf"></i>
+                <span>Ayurvedic</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-droplet"></i>
+                <span>Homeopathic</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user-md"></i>
+                <span>Profile</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <header class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-left">
+                <h1>Welcome, Dr. Rajesh Kumar 👨‍⚕️</h1>
+                <p id="datetime"></p>
+            </div>
+            <div class="header-right">
+                <div class="user-avatar">RK</div>
+            </div>
+        </header>
+
+        <!-- Dashboard -->
+        <main class="dashboard">
+            <!-- Patient Overview -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-users"></i>
+                        Patient Overview
+                    </h2>
+                    <a href="#" class="view-all">View All →</a>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="patient-table">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Age</th>
+                                <th>Condition</th>
+                                <th>Status</th>
+                                <th>Next Appointment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody">
+                            <!-- Dynamic content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Grid Layout -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+                <!-- Upcoming Appointments -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-calendar-check"></i>
+                            Today's Appointments
+                        </h2>
+                    </div>
+                    <div class="appointment-list" id="appointmentList">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-brain"></i>
+                            AI Health Insights
+                        </h2>
+                    </div>
+                    <div id="aiInsightsList">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-file-medical"></i>
+                        Recent Medical Reports
+                    </h2>
+                    <a href="#" class="view-all">View All →</a>
+                </div>
+                <div class="report-grid" id="reportGrid">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-envelope"></i>
+                        Patient Messages
+                        <span style="background: #ef4444; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 8px;">3</span>
+                    </h2>
+                    <a href="#" class="view-all">View All →</a>
+                </div>
+                <div class="message-list" id="messageList">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 AI Healthcare Ecosystem. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Support</a>
+                <a href="#">Help Center</a>
+                <a href="#">About Us</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Dummy Data
+        const patients = [
+            { name: "Sarah Mitchell", age: 34, condition: "Hypertension", status: "stable", appointment: "Nov 5, 2:30 PM" },
+            { name: "John Anderson", age: 58, condition: "Diabetes Type 2", status: "monitoring", appointment: "Nov 6, 10:00 AM" },
+            { name: "Emily Chen", age: 42, condition: "Cardiac Arrhythmia", status: "critical", appointment: "Nov 5, 4:00 PM" },
+            { name: "Michael Brown", age: 67, condition: "Arthritis", status: "stable", appointment: "Nov 7, 11:30 AM" },
+            { name: "Lisa Johnson", age: 29, condition: "Asthma", status: "stable", appointment: "Nov 8, 9:00 AM" }
+        ];
+
+        const appointments = [
+            { patient: "Sarah Mitchell", time: "2:30 PM", type: "Follow-up", status: "confirmed" },
+            { patient: "Emily Chen", time: "4:00 PM", type: "Emergency", status: "urgent" },
+            { patient: "Robert Davis", time: "5:15 PM", type: "Consultation", status: "confirmed" }
+        ];
+
+        const aiInsights = [
+            { 
+                icon: "exclamation-triangle", 
+                title: "Anomaly Detected", 
+                message: "Patient Emily Chen shows irregular heart rhythm patterns. Immediate consultation recommended.",
+                time: "15 mins ago"
+            },
+            { 
+                icon: "chart-line", 
+                title: "Trend Analysis", 
+                message: "Blood sugar levels for John Anderson have been consistently high over the past week.",
+                time: "1 hour ago"
+            },
+            { 
+                icon: "lightbulb", 
+                title: "Treatment Suggestion", 
+                message: "Consider adjusting medication dosage for Sarah Mitchell based on recent lab results.",
+                time: "2 hours ago"
+            }
+        ];
+
+        const reports = [
+            { name: "Blood Test Report", patient: "Sarah Mitchell", date: "Nov 1, 2025", size: "2.4 MB" },
+            { name: "ECG Report", patient: "Emily Chen", date: "Oct 30, 2025", size: "1.8 MB" },
+            { name: "X-Ray Chest", patient: "John Anderson", date: "Oct 28, 2025", size: "5.2 MB" },
+            { name: "MRI Scan", patient: "Michael Brown", date: "Oct 25, 2025", size: "12.5 MB" },
+            { name: "Urine Analysis", patient: "Lisa Johnson", date: "Oct 24, 2025", size: "850 KB" }
+        ];
+
+        const messages = [
+            { name: "Sarah Mitchell", message: "Doctor, my blood pressure readings have been higher than usual this week.", time: "10 mins ago", unread: true },
+            { name: "John Anderson", message: "Thank you for the medication adjustment. Feeling much better now.", time: "1 hour ago", unread: true },
+            { name: "Emily Chen", message: "I've been experiencing chest pains. Should I come in for a checkup?", time: "2 hours ago", unread: true },
+            { name: "Michael Brown", message: "Prescription refill request for arthritis medication.", time: "3 hours ago", unread: false }
+        ];
+
+        // Render Functions
+        function renderPatients() {
+            const tbody = document.getElementById('patientTableBody');
+            tbody.innerHTML = patients.map(p => `
+                <tr>
+                    <td><strong>${p.name}</strong></td>
+                    <td>${p.age}</td>
+                    <td>${p.condition}</td>
+                    <td><span class="status-badge status-${p.status}">${p.status.toUpperCase()}</span></td>
+                    <td>${p.appointment}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAppointments() {
+            const list = document.getElementById('appointmentList');
+            list.innerHTML = appointments.map(a => `
+                <div class="appointment-item">
+                    <div class="appointment-info">
+                        <h4>${a.patient}</h4>
+                        <p><i class="far fa-clock"></i> ${a.time} • ${a.type}</p>
+                    </div>
+                    <button class="join-btn" onclick="alert('Joining video call with ${a.patient}')">
+                        <i class="fas fa-video"></i> Join Call
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderAIInsights() {
+            const list = document.getElementById('aiInsightsList');
+            list.innerHTML = aiInsights.map(i => `
+                <div class="insight-item">
+                    <div class="insight-icon">
+                        <i class="fas fa-${i.icon}"></i>
+                    </div>
+                    <div class="insight-content">
+                        <h4>${i.title}</h4>
+                        <p>${i.message}</p>
+                        <div class="insight-time">${i.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderReports() {
+            const grid = document.getElementById('reportGrid');
+            grid.innerHTML = reports.map(r => `
+                <div class="report-card">
+                    <div class="report-icon"><i class="fas fa-file-medical-alt"></i></div>
+                    <h4>${r.name}</h4>
+                    <p>${r.patient}<br>${r.date} • ${r.size}</p>
+                    <div class="report-actions">
+                        <button class="report-btn btn-view" onclick="alert('Viewing ${r.name}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="report-btn btn-download" onclick="alert('Downloading ${r.name}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderMessages() {
+            const list = document.getElementById('messageList');
+            list.innerHTML = messages.map(m => `
+                <div class="message-item ${m.unread ? 'unread' : ''}">
+                    <div class="message-avatar">${m.name.split(' ').map(n => n[0]).join('')}</div>
+                    <div class="message-content">
+                        <h4>${m.name}</h4>
+                        <p>${m.message}</p>
+                        <div class="message-time">${m.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update DateTime
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const date = now.toLocaleDateString('en-US', options);
+            const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('datetime').textContent = `${date} • ${time}`;
+        }
+
+        // Sidebar Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const mainContent = document.getElementById('mainContent');
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderPatients();
+            renderAppointments();
+            renderAIInsights();
+            renderReports();
+            renderMessages();
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
+    </script>
+</body>
+</html>
