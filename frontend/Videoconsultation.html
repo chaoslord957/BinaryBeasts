@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthConnect - Video Consultation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+
+        .hero p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .chatbot-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .specialty-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .specialty-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .specialty-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .specialty-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .doctors-section {
+            margin-top: 2rem;
+        }
+
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .doctor-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .doctor-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .doctor-specialty {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .doctor-info {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+            padding: 0.5rem 0;
+            border-top: 1px solid #e9ecef;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .consult-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.3s;
+        }
+
+        .consult-btn:hover {
+            opacity: 0.9;
+        }
+
+        .available {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .articles-section {
+            background: #2c3e50;
+            color: white;
+            padding: 3rem 2rem;
+            margin-top: 3rem;
+        }
+
+        .articles-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .article-card {
+            background: #34495e;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .article-image {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        .article-content {
+            padding: 1.5rem;
+        }
+
+        .article-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-author {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-excerpt {
+            color: #ecf0f1;
+            line-height: 1.6;
+        }
+
+        .offers-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 3rem 2rem;
+        }
+
+        .offers-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .offer-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+        }
+
+        .offer-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .offer-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .offer-desc {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .offer-code {
+            background: #f8f9fa;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #f5576c;
+            border: 2px dashed #f5576c;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+
+            .specialty-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">🏥 HealthConnect</div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Doctors</a>
+                <a href="#">About</a>
+                <a href="#">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Video Consultation with Top Doctors</h1>
+            <p>Connect with verified healthcare professionals from the comfort of your home</p>
+        </div>
+
+        <div class="chatbot-section">
+            <div class="chat-header">
+                <div class="chat-icon">💬</div>
+                <div>
+                    <h2>Find Your Doctor</h2>
+                    <p style="color: #666;">Select a specialty to see available doctors</p>
+                </div>
+            </div>
+
+            <div class="specialty-buttons">
+                <div class="specialty-btn" onclick="filterDoctors('general')">
+                    🩺<br>General Physician
+                </div>
+                <div class="specialty-btn" onclick="filterDoctors('cardiology')">
+                    ❤️<br>Cardiology
+                </div>
+                <div class="specialty-btn" onclick="filterDoctors('dermatology')">
+                    ✨<br>Dermatology
+                </div>
+                <div class="specialty-btn" onclick="filterDoctors('pediatrics')">
+                    👶<br>Pediatrics
+                </div>
+                <div class="specialty-btn" onclick="filterDoctors('orthopedics')">
+                    🦴<br>Orthopedics
+                </div>
+                <div class="specialty-btn" onclick="filterDoctors('psychiatry')">
+                    🧠<br>Psychiatry
+                </div>
+            </div>
+        </div>
+
+        <div class="doctors-section">
+            <h2 class="section-title">Available Doctors Nearby</h2>
+            <div class="doctors-grid" id="doctorsGrid"></div>
+        </div>
+    </div>
+
+    <div class="articles-section">
+        <div class="articles-container">
+            <h2 class="section-title">Health Articles by Our Doctors</h2>
+            <div class="articles-grid">
+                <div class="article-card">
+                    <div class="article-image">📝</div>
+                    <div class="article-content">
+                        <h3 class="article-title">Heart Health Tips for Modern Living</h3>
+                        <p class="article-author">Dr. Sarah Johnson - Cardiologist</p>
+                        <p class="article-excerpt">Learn essential tips to maintain cardiovascular health in today's fast-paced lifestyle...</p>
+                    </div>
+                </div>
+                <div class="article-card">
+                    <div class="article-image">🌟</div>
+                    <div class="article-content">
+                        <h3 class="article-title">Understanding Skin Care Basics</h3>
+                        <p class="article-author">Dr. Michael Chen - Dermatologist</p>
+                        <p class="article-excerpt">A comprehensive guide to maintaining healthy skin through proper care and nutrition...</p>
+                    </div>
+                </div>
+                <div class="article-card">
+                    <div class="article-image">💪</div>
+                    <div class="article-content">
+                        <h3 class="article-title">Managing Stress and Anxiety</h3>
+                        <p class="article-author">Dr. Emma Williams - Psychiatrist</p>
+                        <p class="article-excerpt">Practical strategies for managing mental health in challenging times...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="offers-section">
+        <div class="offers-container">
+            <h2 class="section-title" style="color: white;">Special Offers</h2>
+            <div class="offers-grid">
+                <div class="offer-card">
+                    <div class="offer-icon">🎉</div>
+                    <h3 class="offer-title">First Consultation Free</h3>
+                    <p class="offer-desc">Get your first video consultation absolutely free</p>
+                    <div class="offer-code">FIRST100</div>
+                </div>
+                <div class="offer-card">
+                    <div class="offer-icon">💰</div>
+                    <h3 class="offer-title">30% Off Health Checkup</h3>
+                    <p class="offer-desc">Complete health checkup package at discounted rates</p>
+                    <div class="offer-code">HEALTH30</div>
+                </div>
+                <div class="offer-card">
+                    <div class="offer-icon">👨‍👩‍👧‍👦</div>
+                    <h3 class="offer-title">Family Package</h3>
+                    <p class="offer-desc">Subscribe for 4 family members, pay for 3</p>
+                    <div class="offer-code">FAM25</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const doctors = [
+            { name: 'Dr. Sarah Johnson', specialty: 'cardiology', exp: '15 yrs', rating: '4.8', fee: '₹500', avatar: '👩‍⚕️' },
+            { name: 'Dr. Michael Chen', specialty: 'dermatology', exp: '12 yrs', rating: '4.9', fee: '₹600', avatar: '👨‍⚕️' },
+            { name: 'Dr. Priya Sharma', specialty: 'general', exp: '10 yrs', rating: '4.7', fee: '₹400', avatar: '👩‍⚕️' },
+            { name: 'Dr. Rajesh Kumar', specialty: 'orthopedics', exp: '18 yrs', rating: '4.8', fee: '₹700', avatar: '👨‍⚕️' },
+            { name: 'Dr. Emma Williams', specialty: 'psychiatry', exp: '14 yrs', rating: '4.9', fee: '₹800', avatar: '👩‍⚕️' },
+            { name: 'Dr. Amit Patel', specialty: 'pediatrics', exp: '11 yrs', rating: '4.7', fee: '₹500', avatar: '👨‍⚕️' },
+            { name: 'Dr. Lisa Anderson', specialty: 'general', exp: '9 yrs', rating: '4.6', fee: '₹450', avatar: '👩‍⚕️' },
+            { name: 'Dr. James Brown', specialty: 'cardiology', exp: '20 yrs', rating: '5.0', fee: '₹900', avatar: '👨‍⚕️' },
+        ];
+
+        function displayDoctors(filteredDoctors) {
+            const grid = document.getElementById('doctorsGrid');
+            grid.innerHTML = filteredDoctors.map(doc => `
+                <div class="doctor-card">
+                    <div class="doctor-avatar">${doc.avatar}</div>
+                    <div class="available">Available Now</div>
+                    <h3 class="doctor-name">${doc.name}</h3>
+                    <p class="doctor-specialty">${doc.specialty.charAt(0).toUpperCase() + doc.specialty.slice(1)}</p>
+                    <div class="doctor-info">
+                        <div class="info-item">
+                            <div class="info-label">Experience</div>
+                            <div class="info-value">${doc.exp}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Rating</div>
+                            <div class="info-value">⭐ ${doc.rating}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Fee</div>
+                            <div class="info-value">${doc.fee}</div>
+                        </div>
+                    </div>
+                    <button class="consult-btn" onclick="startConsultation('${doc.name}')">Book Video Consultation</button>
+                </div>
+            `).join('');
+        }
+
+        function filterDoctors(specialty) {
+            document.querySelectorAll('.specialty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.specialty-btn').classList.add('active');
+
+            const filtered = doctors.filter(doc => doc.specialty === specialty);
+            displayDoctors(filtered);
+        }
+
+        function startConsultation(doctorName) {
+            alert(`Booking video consultation with ${doctorName}.\n\nYou'll be redirected to the payment page.`);
+        }
+
+        // Display all doctors initially
+        displayDoctors(doctors);
+    </script>
+</body>
+</html>
